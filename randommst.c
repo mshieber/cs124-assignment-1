@@ -1,19 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-int dim = 0;
-int n = 2;
 unsigned int factorial(unsigned int n)
 {
     if (n == 0)
         return 1;
     return n * factorial(n - 1);
 }
-int num = factorial(n);
-int denom = 2 * factorial(n-2);
-int edgeNum = num/edgeNum
 
+
+int dim =1;
+int n = 8;
 
 struct node{
   /* malloc size of dimension */
@@ -27,11 +24,11 @@ struct node* createNode(int, float);
 struct edge{
   int row;
   int col;
-  int weight;
+  float weight;
   struct edge*next;
 };
-struct edge* createEdge(int,int, int);
-struct edge* createEdge(int r, int c, int w){
+struct edge* createEdge(int,int, float);
+struct edge* createEdge(int r, int c, float w){
   struct edge* newEdge = malloc(sizeof(struct edge));
   newEdge->row = r;
   newEdge->col = c;
@@ -53,7 +50,14 @@ void printNode(struct node* n){
   printf("%f",n->weight);
   printf("%s", ")");
 }
-
+void printEdge(struct edge* e){
+  printf("%s", "(");
+  printf("%d",e->row);
+  printf("%s", ",");
+  printf("%d",e->col);
+  printf("%s", ") Weight: ");
+  printf("%f\n",e->weight);
+}
 /*****************
     UNION FIND
 ******************/
@@ -97,33 +101,12 @@ struct Set* unionSet(struct Set* x, struct Set* y){
   return linkSet(findSet(x), findSet(y));
 }
 
-/*****************
-    Kruskals
-******************/
 
-int kruskals(int V, struct edge E[]){
-  int mstWeight = 0;
-  struct Set* setArray[V];
-  /* SORT E BY WEIGHT */
-
-  /*                  */
-  for (int i = 0; i < V; i++){
-    setArray[i] = makeSet(i);
-  }
-  for (int e = 0; e < edgeNum; e++){
-    int u = E[e].row;
-    int v = E[e].col;
-    if (findSet(setArray[u]) != findSet(setArray[v])){
-      mstWeight = mstWeight + E[e].weight;
-      unionSet(setArray[u], setArray[v]);
-    }
-  }
-  return mstWeight;
-}
-
-/**** SORT ****/
+/***********
+    SORT
+************/
 void swap(struct edge *a, struct edge *b) {
-  int t = *a;
+  struct edge t = *a;
   *a = *b;
   *b = t;
 }
@@ -132,7 +115,8 @@ void swap(struct edge *a, struct edge *b) {
 int partition(struct edge E[], int low, int high) {
 
   // Select the pivot element
-  int pivot = E[high].weight;
+  float pivot = E[high].weight;
+  /*printf("%f", pivot);*/
   int i = (low - 1);
 
   // Put the elements smaller than pivot on the left
@@ -163,11 +147,49 @@ void quickSort(struct edge E[], int low, int high) {
   }
 }
 
+// Function to print eklements of an array
+void printArray(struct edge E[], int size) {
+  for (int i = 0; i < size; ++i) {
+    printEdge(&E[i]);
+  }
+  printf("\n");
+}
+
+/*****************
+    Kruskals
+******************/
+
+int kruskals(int V, struct edge E[], int edgeNum){
+  float mstWeight = 0;
+  struct Set* setArray[V];
+  quickSort(E, 0, edgeNum-1);
+  for (int i = 0; i < V; i++){
+    setArray[i] = makeSet(i);
+  }
+  for (int e = 0; e < edgeNum; e++){
+    int u = E[e].row;
+    int v = E[e].col;
+    if (findSet(setArray[u]) != findSet(setArray[v])){
+      printEdge(&E[e]);
+      mstWeight = mstWeight + E[e].weight;
+      printf("->%f\n", mstWeight);
+      unionSet(setArray[u], setArray[v]);
+    }
+  }
+  printf("%f", mstWeight);
+  return mstWeight;
+}
+
+
 /*****************
       Run Algs
 ******************/
 int main() {
- struct edge edges [n*n]; /* this should be n choose 2, but for now it is n^2 */
+  int num = factorial(n);
+  int denom = 2 * factorial(n-2);
+  int numOfEdges = num/denom;
+
+ struct edge edges [numOfEdges]; /* this should be n choose 2, but for now it is n^2 */
  struct node adj [n][n];
  int count = 0;
  for(int i = 0; i< n; i ++){
@@ -199,10 +221,25 @@ int main() {
   for (int i = 0; i< n; i++){
     printf("%s\n", " ");
     for(int j =0 ; j<n; j ++){
-      printNode(&adj[i][j]);
+      /*printNode(&adj[i][j]);*/
     }
   }
- }
+  printf("%s\n", " ");
+  for (int i =0; i< (numOfEdges); i++){
+    /*printEdge(&edges[i]);*/
+  }
+
+  printf("\n");
+
+  /* kruskals testing*/
+  kruskals(n, edges, numOfEdges);
+
+  return 0;
+}
+
+
+
+
 
 
 
