@@ -78,37 +78,57 @@ struct Set {
 };
 
 struct Set* makeSet(int x) {
-  struct set* newSet = malloc(sizeof(struct set));
-  newSet->key = x;
+  struct Set* newSet = malloc(sizeof(struct Set));
   newSet->rank = 0;
-  newSet->parent = x;
+  newSet->parent = newSet;
   return newSet;
 };
 
 struct Set* findSet(struct Set* set) {
-  if (set->key != set->parent->key){
-    set->parent = findSet(set->parent)
+  if (set != set->parent){
+    set->parent = findSet(set->parent);
   }
-  return set->parent
+  return set->parent;
 }
 
 struct Set* linkSet(struct Set* x, struct Set* y){
   if (x->rank > y->rank){
-    y->parent = x
-    return x
+    y->parent = x;
+    return x;
   }
   if (x->rank == y->rank){
-    y->rank = y->rank + 1
-    x->parent = y
+    y->rank = y->rank + 1;
+    x->parent = y;
   }
   else{
-    x->parent = y
+    x->parent = y;
   }
-  return y
+  return y;
 }
 
 struct Set* unionSet(struct Set* x, struct Set* y){
-  linkSet(findSet(x), findSet(y))
+  return linkSet(findSet(x), findSet(y));
+}
+
+/*****************
+    Kruskals
+******************/
+int kruskals(int V, struct edge* E){
+  int mstWeight = 0;
+  struct Set* setsArray[V];
+  /* SORT E BY WEIGHT */
+  for (int i = 0; i < V; i++){
+    setsArray[i] = makeSet(i);
+  }
+  for (int e = 0; e < sizeof(E); e++){
+    int u = E[e]->row;
+    int v = E[e]->col;
+    if (findSet(setsArray[u]) != findSet(setsArray[v])){
+      mstWeight = mstWeight + E[e]->weight;
+      unionSet(setArray[u], setArray[v]);
+    }
+  }
+  return mstWeight;
 }
 
 
@@ -116,7 +136,7 @@ struct Set* unionSet(struct Set* x, struct Set* y){
 /*****************
       Run Algs
 ******************/
-int  main() {
+int main() {
 
   int n = 4;
   float G [n][n]; /* empty undirected graph */
